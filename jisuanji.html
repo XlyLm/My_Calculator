@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="Css/base.css">
+    <link rel="stylesheet" type="text/css" href="Css/jisuanji.css">
+    <script type="text/javascript " src="Js/Js.js"></script>
+    <script type="text/javascript ">
+        function addClass(obj,cn){
+            obj.className +=""+cn;//当元素不只有一个class时在最后一个class后加一个空格
+        }
+        function removeClass(obj,cn){
+            var reg = new RegExp("\\b"+""+cn+"\\b");
+            obj.className = obj.className.replace(reg,"");
+        }
+        function hasClass(obj,cn){
+            var reg = new RegExp("\\b"+cn+"\\b");
+            return reg.test(obj.className);
+        }
+        function toggleClass(obj,cn){
+            if(hasClass(obj,cn)){
+                removeClass(obj,cn);
+            }else{
+                addClass(obj,cn);
+            }
+        }
+        function getStyle(obj,name){
+            return obj.getAttribute(name);
+        }
+        function move(obj,arr,target,speed,callback){
+            clearInterval(obj.timer);
+            var current = Number(getStyle(obj,arr));
+            if(current<target){
+                speed = -speed;
+            }
+            obj.timer = setInterval(function(){
+                var oldValue = Number(getStyle(obj,arr));
+                var new_Value = oldValue + speed;
+                if((speed < 0 && new_Value < target) || (speed > 0 && new_Value > target)){
+                    new_Value = target;
+                }
+                obj.style[arr] = new_Value + "px";
+                if(!(new_Value < target ||new_Value > target)){
+                    clearInterval(obj.timer);
+                }
+                callback();
+            },30)
+        }
+        window.onload = function(){
+            // 数据清除函数
+            function clear(){
+                arr = [];
+                str = [];
+                index = 1;
+            }
+            //清除显示屏
+            function clearShown(obj){
+                // var answerShown = document.getElementsByClassName("answerShown")[0];    //获取答案显示屏对象
+                obj.innerHTML = null;
+            }
+            //字符存储函数
+            function storageStr(obj){
+                if(index === 0){
+                    if(str[str.length-1] === "."){
+                        arr[arr.length-2] = arr[arr.length-2] + str.pop() + arr.pop();
+                    }
+                    str.push(obj.innerHTML);
+                    index = 1;
+                    get();
+                    shown(keyShown,all_,20);
+                }
+            }
+            //数字存储函数
+            function storageNum(obj){
+                if(index === 1){
+                    arr.push(obj.innerHTML);
+                }else{
+                    if(str[str.length-1] !== "."){
+                        arr[arr.length-1] = (Number(arr[arr.length-1])*10 + Number(obj.innerHTML)).toString();
+                    }else {
+                        arr[arr.length - 1] = arr[arr.length - 1] + obj.innerHTML;
+                    }
+                }
+                index = 0;
+                get();
+                shown(keyShown,all_,20);
+                clearShown(answerShown);
+            }
+            //显示屏操作函数
+            function shown(obj,num1,num2){
+                obj.innerHTML = num1;
+                obj.style.lineHeight = 60 + "px";
+                obj.style.fontSize = num2 + "px";
+                obj.style.color = "white";
+            }
+            //提取arr和str数据
+            function get(){
+                all_ = "";
+                var i=0;
+                while(true){
+                    if(arr[i] === undefined && str[i] === undefined)
+                        break;
+                    if(arr[i] !== undefined){
+                        all_ = all_ + arr[i];
+                    }
+                    if(str[i] !== undefined){
+                        all_ = all_ + str[i];
+                    }
+                    i++;
+                }
+            }
+
+            var arr = [];   // 定义Number数组存放数字
+            var str = [];   // 定义String数组存放字符
+            var all_;  //定义arr和str数据总储存
+            var index = 1;  //定义表示变量区分输入为数字或字符
+            var answerShown = document.getElementsByClassName("answerShown")[0];    //获取答案显示屏对象
+            var keyShown = document.getElementsByClassName("keyShown")[0];  //获取操作数显示屏
+            var allkey = document.getElementsByTagName("a");    // 获取所有按键
+
+                // 为取余绑定点击效应函数
+            allkey[0].onclick = function(){
+                var quYu = document.getElementsByClassName("quYu")[0];
+                storageStr(quYu);
+            };
+                // 为取整绑定点击效应函数
+            allkey[1].onclick = function(){
+                var quZheng = document.getElementsByClassName("quZheng")[0];
+                storageStr(quZheng);
+            };
+                // 为清空数据绑定点击效应函数
+            allkey[2].onclick = function(){
+                clear();    //初始化内存
+                clearShown(answerShown);
+                clearShown(keyShown);
+                alert("已经清除数据！");
+            };
+                // 为删除上一步操作绑定点击效应函数
+            allkey[3].onclick = function(){
+                if(index === 1){
+                    if(str.pop() !== undefined)
+                        index = 0;
+                }else{
+                    if((arr[arr.length-1]>9)||(arr[arr.length-1]<-9)){
+                        arr[arr.length-1] = (parseInt(arr[arr.length-1]/10)).toString();
+                    }else{
+                        arr.pop();
+                        index = 1;
+                    }
+                }
+                get();
+                shown(keyShown,all_,20);
+            };
+                // 为7绑定点击效应函数
+            allkey[4].onclick = function(){
+                var _7 = document.getElementsByClassName("_7")[0];
+                storageNum(_7);
+            };
+                // 为8绑定点击效应函数
+            allkey[5].onclick = function(){
+                var _8 = document.getElementsByClassName("_8")[0];
+                storageNum(_8);
+            };
+                // 为9绑定点击效应函数
+            allkey[6].onclick = function(){
+                var _9 = document.getElementsByClassName("_9")[0];
+                storageNum(_9);
+            };
+                // 为乘法绑定点击效应函数
+            allkey[7].onclick = function(){
+                var cheng = document.getElementsByClassName("cheng")[0];
+                storageStr(cheng);
+            };
+                // 为4绑定点击效应函数
+            allkey[8].onclick = function(){
+                var _4 = document.getElementsByClassName("_4")[0];
+                storageNum(_4);
+            };
+                // 为5绑定点击效应函数
+            allkey[9].onclick = function(){
+                var _5 = document.getElementsByClassName("_5")[0];
+                storageNum(_5);
+            };
+                // 为6绑定点击效应函数
+            allkey[10].onclick = function(){
+                var _6 = document.getElementsByClassName("_6")[0];
+                storageNum(_6);
+            };
+                // 为减法绑定点击效应函数
+            allkey[11].onclick = function(){
+                var jian = document.getElementsByClassName("jian")[0];
+                storageStr(jian);
+            };
+                // 为1绑定点击效应函数
+            allkey[12].onclick = function(){
+                var _1 = document.getElementsByClassName("_1")[0];
+                storageNum(_1);
+            };
+                // 为2绑定点击效应函数
+            allkey[13].onclick = function(){
+                var _2 = document.getElementsByClassName("_2")[0];
+                storageNum(_2);
+            };
+                // 为3绑定点击效应函数
+            allkey[14].onclick = function(){
+                var _3 = document.getElementsByClassName("_3")[0];
+                storageNum(_3);
+            };
+                // 为加法绑定点击效应函数
+            allkey[15].onclick = function(){
+                var add = document.getElementsByClassName("add")[0];
+                storageStr(add);
+            };
+                // 为加\减绑定点击效应函数
+            allkey[16].onclick = function(){
+                if(index === 0) {
+                    if(str[str.length-1] === "."){
+                        arr[arr.length-2] = arr[arr.length-2] + str.pop() + arr.pop();
+                    }
+                    arr[arr.length - 1] = (-Number(arr[arr.length - 1])).toString();
+                }
+                get();
+                shown(keyShown,all_,20);
+            };
+                // 为0绑定点击效应函数
+            allkey[17].onclick = function(){
+                var _0 = document.getElementsByClassName("_0")[0];
+                storageNum(_0);
+            };
+                // 为小数点绑定点击效应函数
+            allkey[18].onclick = function(){
+                var spot = document.getElementsByClassName("spot")[0];
+                if((index === 0)&&str[str.length-1] !== "."){
+                    str.push(spot.innerHTML);
+                    index = 1;
+                    get();
+                    shown(keyShown,all_,20);
+                }
+            };
+                // 为等于绑定点击效应函数
+            allkey[19].onclick = function(){
+                if(str[str.length-1] === "." && str.length !== arr.length){
+                    arr[arr.length-2] = arr[arr.length-2] + str.pop() + arr.pop();
+                }else if(str[str.length-1] === "." && str.length === arr.length){
+                    arr[arr.length-1] = arr[arr.length-1] + str.pop();
+                }
+                fun();
+                clear();
+            };
+            //运算函数
+            function fun(){
+                var result = [];
+                for(var j=0;j<str.length;j++){
+                    switch(str[j]){
+                        case '*':
+                            if(arr[j+1] === undefined){
+                                result.push(Number(arr[j]));
+                                break;
+                            }
+                            arr[j+1] = (Number(arr[j]) * Number(arr[j+1])).toString();
+                            break;
+                        case '%':
+                            if(arr[j+1] === undefined){
+                                result.push(Number(arr[j]));
+                                break;
+                            }
+                            arr[j+1] = (Number(arr[j])/Number(arr[j+1]) - parseInt(Number(arr[j])/Number(arr[j+1]))).toString();
+                            break;
+                        case '/':
+                            if(arr[j+1] === undefined){
+                                result.push(Number(arr[j]));
+                                break;
+                            }
+                            arr[j+1] = (Number(arr[j]) / Number(arr[j+1])).toString();
+                            break;
+                        case '+':
+                        case '-':
+                            result.push(Number(arr[j]));
+                            break;
+                    }
+                }
+                if(arr.length !== str.length)
+                    result.push(Number(arr[arr.length-1]));
+                var Result = result[0];
+                var k = 0;
+                for(var i=0;i<str.length;i++){
+                    switch(str[i]){
+                        case '+':
+                            if(result[k+1] === undefined){
+                                break;
+                            }
+                            Result = Result + result[k+1];
+                            k++;
+                            break;
+                        case '-':
+                            if(result[k+1] === undefined){
+                                break;
+                            }
+                            Result = Result - result[k+1];
+                            k++;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                var ReChange = Result + 0;
+                if(ReChange.toString().length > 12){
+                    alert("结果超出显示范围，我们将在提示框显示！");
+                    alert(all_ + "=" + Result);
+                }else{
+                    if(Result === undefined){
+                    alert("您还没有输入数据！");
+                    }else{
+                        shown(answerShown,Result,26);
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body>
+    <!--计算器容器-->
+    <div class="calculatorContainer">
+        <!--计算器显示屏-->
+        <div class="screenContainer">
+            <div class="screen">
+                <div class="answerShown overflow "></div>
+                <div class="keyShown overflow"></div>
+            </div>
+        </div>
+        <!--计算器按键-->
+        <div class="key">
+            <table>
+                <tr>
+                    <td><a href="javascript:;" class="block quYu">%</a></td>
+                    <td><a href="javascript:;" class="block quZheng">/</a></td>
+                    <td><a href="javascript:;" class="block allClear">C</a></td>
+                    <td><a href="javascript:;" class="block last clear"><</a></td>
+                </tr>
+                <tr>
+                    <td><a href="javascript:;" class="block _7">7</a></td>
+                    <td><a href="javascript:;" class="block _8">8</a></td>
+                    <td><a href="javascript:;" class="block _9">9</a></td>
+                    <td><a href="javascript:;" class="block last cheng">*</a></td>
+                </tr>
+                <tr>
+                    <td><a href="javascript:;" class="block _4">4</a></td>
+                    <td><a href="javascript:;" class="block _5">5</a></td>
+                    <td><a href="javascript:;" class="block _6">6</a></td>
+                    <td><a href="javascript:;" class="block last jian">-</a></td>
+                </tr>
+                <tr>
+                    <td><a href="javascript:;" class="block _1">1</a></td>
+                    <td><a href="javascript:;" class="block _2">2</a></td>
+                    <td><a href="javascript:;" class="block _3">3</a></td>
+                    <td><a href="javascript:;" class="block last add">+</a></td>
+                </tr>
+                <tr>
+                    <td><a href="javascript:;" class="block add_jian">+/-</a></td>
+                    <td><a href="javascript:;" class="block _0">0</a></td>
+                    <td><a href="javascript:;" class="block spot">.</a></td>
+                    <td><a href="javascript:;" class="block last equal">=</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
